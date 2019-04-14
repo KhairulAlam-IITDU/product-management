@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { IProduct } from '../../models/product';
+import { ProductService } from '../../services/product.service';
 
 @Component({
-  selector: 'app-product-list',
+  // selector: 'app-product-list',
   templateUrl: './product-list.component.html',
   styleUrls: ['./product-list.component.css']
 })
@@ -12,6 +13,7 @@ export class ProductListComponent implements OnInit {
   imageMargin = 2;
   showImage = false;
   _listFilter: string;
+  errorMessage: string;
 
   get listFilter(): string {
     return this._listFilter;
@@ -24,35 +26,19 @@ export class ProductListComponent implements OnInit {
   }
 
   filteredProducts: IProduct[];
-  products: IProduct[] = [
-    {
-      productId: 2,
-      productName: 'Garden Cart',
-      productCode: 'GDN-0023',
-      releaseDate: 'April 13, 2019',
-      description: '15 gallon capacity rolling garden',
-      price: 32.99,
-      starRating: 4.2,
-      imageUrl: 'https://openclipart.org/download/58471/garden-cart.svg'
-    },
-    {
-      productId: 5,
-      productName: 'Hammer',
-      productCode: 'TBX-0048',
-      releaseDate: 'April 10, 2019',
-      description: 'Curved claw steel hammer',
-      price: 8.9,
-      starRating: 4.8,
-      imageUrl: 'https://openclipart.org/download/312585/1545752217.svg'
-    }
-  ];
+  products: IProduct[] = [];
 
-  constructor() {
-    this.listFilter = '';
-    this.filteredProducts = this.products;
+  constructor(private productService: ProductService) {}
+
+  ngOnInit() {
+    this.productService.getProducts().subscribe(
+      products => {
+        this.products = products;
+        this.filteredProducts = this.products;
+      },
+      error => (this.errorMessage = <any>error)
+    );
   }
-
-  ngOnInit() {}
 
   toggleImage(): void {
     this.showImage = !this.showImage;
